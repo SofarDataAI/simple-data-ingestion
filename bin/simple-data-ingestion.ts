@@ -24,7 +24,7 @@ checkEnvVariables('APP_NAME',
 'EMBEDDING_DATASET_BUCKET_NAME',
 );
 
-const { CDK_DEFAULT_ACCOUNT: account, CDK_DEFAULT_REGION: region } = process.env;
+const { CDK_DEFAULT_ACCOUNT: account } = process.env;
 
 const cdkRegion = process.env.CDK_DEPLOY_REGION!;
 const deployEnvironment = process.env.ENVIRONMENT!;
@@ -46,7 +46,7 @@ appAspects.add(new ApplyTags({
 appAspects.add(new AwsSolutionsChecks());
 
 const stackProps: SimpleDataIngestionStackProps = {
-  resourcePrefix: `${appName}-${deployEnvironment}`,
+  resourcePrefix: `${appName}-${deployEnvironment}-${cdkRegion}`,
   env: {
     region: cdkRegion,
     account,
