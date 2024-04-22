@@ -1,6 +1,21 @@
 import { StackProps } from "aws-cdk-lib";
 
-export interface SimpleDataIngestionStackProps extends StackProps {
+export interface SimpleDataIngestionStackProps extends StackProps, SimpleDataIngestionBaseStackProps {
+    /**
+     * The name of the unstructured data bucket.
+     */
+    readonly unstructuredDataBucketName: string;
+    /**
+     * The name of the golden dataset bucket.
+     */
+    readonly goldenDatasetBucketName: string;
+    /**
+     * The name of the embedding dataset bucket.
+     */
+    readonly embeddingDatasetBucketName: string;
+}
+
+export interface SimpleDataIngestionBaseStackProps {
     /**
      * A prefix used for naming resources to ensure uniqueness across deployments.
      */
@@ -17,16 +32,4 @@ export interface SimpleDataIngestionStackProps extends StackProps {
      * The name of the application, used for resource naming and tagging.
      */
     readonly appName: string;
-    /**
-     * The name of the unstructured data bucket.
-     */
-    readonly unstructuredDataBucketName: string;
-    /**
-     * The name of the golden dataset bucket.
-     */
-    readonly goldenDatasetBucketName: string;
-    /**
-     * The name of the embedding dataset bucket.
-     */
-    readonly embeddingDatasetBucketName: string;
 }
