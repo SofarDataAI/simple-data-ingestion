@@ -7,6 +7,14 @@ import { Construct } from "constructs";
 import { LlrtFunction } from "cdk-lambda-llrt";
 import { OutputFormat } from "aws-cdk-lib/aws-lambda-nodejs";
 
+/**
+ * Represents a nested stack for data ingestion functionalities.
+ * This stack includes resources like Lambda functions and associated roles and permissions.
+ *
+ * @param {Construct} scope - The scope in which to define this construct.
+ * @param {string} id - The scoped construct ID.
+ * @param {DataIngestionStackProps} props - The properties for the data ingestion stack.
+ */
 export class DataIngestionStack extends NestedStack {
   constructor(scope: Construct, id: string, props: DataIngestionStackProps) {
     super(scope, id, props);
