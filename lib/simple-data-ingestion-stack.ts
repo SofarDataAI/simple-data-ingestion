@@ -1,16 +1,20 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-// import * as sqs from 'aws-cdk-lib/aws-sqs';
+import * as s3 from 'aws-cdk-lib/aws-s3';
+import { SimpleDataIngestionStackProps } from './SimpleDataIngestionStackProps';
+import { DataIngestionStack } from './constructs/data-ingestion/data-ingestion-stack';
 
 export class SimpleDataIngestionStack extends cdk.Stack {
-  constructor(scope: Construct, id: string, props?: cdk.StackProps) {
+  constructor(scope: Construct, id: string, props: SimpleDataIngestionStackProps) {
     super(scope, id, props);
 
-    // The code that defines your stack goes here
+    const s3UnstructuredDataBucket = s3.Bucket.fromBucketName(this, `${props.resourcePrefix}-unstructuredDataBucket`, props.unstructuredDataBucketName);
+    const s3GoldenDatasetBucket = s3.Bucket.fromBucketName(this, `${props.resourcePrefix}-goldenDatasetBucket`, props.goldenDatasetBucketName);
+    const s3EmbeddingDatasetBucket = s3.Bucket.fromBucketName(this, `${props.resourcePrefix}-embeddingDatasetBucket`, props.embeddingDatasetBucketName);
 
-    // example resource
-    // const queue = new sqs.Queue(this, 'SimpleDataIngestionQueue', {
-    //   visibilityTimeout: cdk.Duration.seconds(300)
-    // });
+    new DataIngestionStack(this, `${props.resourcePrefix}-DataIngestionStack`, {
+        ...props,
+        uploadingBucket: s3UnstructuredDataBucket,
+    });
   }
 }
