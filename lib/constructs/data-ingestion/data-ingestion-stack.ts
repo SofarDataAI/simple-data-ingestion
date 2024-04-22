@@ -19,7 +19,7 @@ export class DataIngestionStack extends NestedStack {
   constructor(scope: Construct, id: string, props: DataIngestionStackProps) {
     super(scope, id, props);
 
-    const uploadingBucket = props.uploadingBucket;
+    const uploadingBucket = props.s3UnstructuredDataBucket;
 
     const dataIngestionLambdaFn = new LlrtFunction(this, `${props.resourcePrefix}-dataIngestionLambdaFn`, {
       functionName: `${props.resourcePrefix}-dataIngestionLambdaFn`,
