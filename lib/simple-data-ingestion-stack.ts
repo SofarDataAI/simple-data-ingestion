@@ -14,7 +14,7 @@ export class SimpleDataIngestionStack extends cdk.Stack {
 
     new DataIngestionStack(this, `${props.resourcePrefix}-DataIngestionStack`, {
         ...props,
-        uploadingBucket: s3UnstructuredDataBucket,
+        s3UnstructuredDataBucket: s3UnstructuredDataBucket,
     });
   }
 }
