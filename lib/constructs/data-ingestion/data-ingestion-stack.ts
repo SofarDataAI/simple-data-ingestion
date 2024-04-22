@@ -13,11 +13,6 @@ export class DataIngestionStack extends NestedStack {
 
     const uploadingBucket = props.uploadingBucket;
 
-    // define the data ingestion stack here
-    // llrt lambda to generante presigned url for s3
-    // lambda function url
-    // authentication with Cognito
-
     const dataIngestionLambdaFn = new LlrtFunction(this, `${props.resourcePrefix}-dataIngestionLambdaFn`, {
       functionName: `${props.resourcePrefix}-dataIngestionLambdaFn`,
       runtime: cdk.aws_lambda.Runtime.NODEJS_20_X,
@@ -57,5 +52,24 @@ export class DataIngestionStack extends NestedStack {
 
     // grant permissions to the lambda function
     uploadingBucket.grantWrite(dataIngestionLambdaFn);
+
+    const dataIngestionLambdaFnUrl = new cdk.aws_lambda.FunctionUrl(this, `${props.resourcePrefix}-${props.deployRegion}-dataIngestionLambdaFn-Url`, {
+      function: dataIngestionLambdaFn,
+      invokeMode: cdk.aws_lambda.InvokeMode.BUFFERED,
+      cors: {
+          allowedOrigins: ['*'],
+          allowedMethods: [lambda.HttpMethod.POST],
+          allowedHeaders: ['*'],
+          allowCredentials: true,
+      },
+      authType: cdk.aws_lambda.FunctionUrlAuthType.NONE,
+    });
+
+    // export the URL of the Lambda Function
+    new cdk.CfnOutput(this, `${props.resourcePrefix}-${props.deployRegion}-dataIngestionLambdaFn-Url-Export`, {
+      value: dataIngestionLambdaFnUrl.url,
+      exportName: `${props.resourcePrefix}-${props.deployRegion}-dataIngestionLambdaFn-Url-Export`,
+      description: `The URL of the data ingestion lambda function.`,
+    });
   }
 }
