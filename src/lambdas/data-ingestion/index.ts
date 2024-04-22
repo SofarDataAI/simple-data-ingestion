@@ -8,6 +8,13 @@ import { StatusCodes } from 'http-status-codes';
 const s3Client = new s3.S3Client({ });
 const S3_BUCKET_NAME = process.env.S3_BUCKET_NAME!;
 
+/**
+ * Handles the generation of a presigned URL for uploading a PDF file to S3.
+ *
+ * @param {APIGatewayProxyEvent} event - The event object from API Gateway.
+ * @returns {Promise<APIGatewayProxyResult>} - Returns a response object containing the presigned URL or an error message.
+ * @throws {Error} - Throws an error if S3_BUCKET_NAME is not defined or if there is an issue generating the presigned URL.
+ */
 export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
     const correlationId = uuidv4();
     const method = 'data-ingestion.handler';
@@ -22,6 +29,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
         };
     }
 
+    // prepare parameters for generating presigned URL
     const params = {
         Bucket: S3_BUCKET_NAME,
         Key: `${correlationId}/upload.pdf`,
@@ -30,7 +38,7 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
     try {
         const command = new GetObjectCommand(params);
-        const url = await getSignedUrl(s3Client, command, { expiresIn: 60 });
+        const url = await getSignedUrl(s3Client, command, { expiresIn: 60 }); // this link will expire in 60 seconds
         console.log(`${prefix} - Presigned URL generated.`);
         return {
             statusCode: StatusCodes.OK,
