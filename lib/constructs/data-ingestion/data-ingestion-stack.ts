@@ -66,7 +66,7 @@ export class DataIngestionStack extends NestedStack {
       invokeMode: cdk.aws_lambda.InvokeMode.BUFFERED,
       cors: {
           allowedOrigins: ['*'],
-          allowedMethods: [lambda.HttpMethod.POST],
+          allowedMethods: [lambda.HttpMethod.GET],
           allowedHeaders: ['*'],
           allowCredentials: true,
       },
