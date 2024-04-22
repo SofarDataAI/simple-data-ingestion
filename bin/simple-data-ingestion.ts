@@ -1,21 +1,67 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
+
 import * as cdk from 'aws-cdk-lib';
+import * as dotenv from 'dotenv';
+import { Aspects } from 'aws-cdk-lib';
+import { ApplyTags } from '../utils/apply-tag';
+import { AwsSolutionsChecks } from 'cdk-nag';
+import { checkEnvVariables } from '../utils/check-environment-variable';
 import { SimpleDataIngestionStack } from '../lib/simple-data-ingestion-stack';
+import { SimpleDataIngestionStackProps } from '../lib/SimpleDataIngestionStackProps';
 
+dotenv.config(); // Load environment variables from .env file
 const app = new cdk.App();
-new SimpleDataIngestionStack(app, 'SimpleDataIngestionStack', {
-  /* If you don't specify 'env', this stack will be environment-agnostic.
-   * Account/Region-dependent features and context lookups will not work,
-   * but a single synthesized template can be deployed anywhere. */
+const appAspects = Aspects.of(app);
 
-  /* Uncomment the next line to specialize this stack for the AWS Account
-   * and Region that are implied by the current CLI configuration. */
-  // env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: process.env.CDK_DEFAULT_REGION },
+// check environment variables
+checkEnvVariables('APP_NAME',
+'OWNER',
+'CDK_DEPLOY_REGION',
+'ENVIRONMENT',
+'UNSTRUCTURED_DATA_BUCKET_NAME',
+'GOLDEN_DATASET_BUCKET_NAME',
+'EMBEDDING_DATASET_BUCKET_NAME',
+);
 
-  /* Uncomment the next line if you know exactly what Account and Region you
-   * want to deploy the stack to. */
-  // env: { account: '123456789012', region: 'us-east-1' },
+const { CDK_DEFAULT_ACCOUNT: account } = process.env;
 
-  /* For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html */
+const cdkRegion = process.env.CDK_DEPLOY_REGION!;
+const deployEnvironment = process.env.ENVIRONMENT!;
+
+const appName = process.env.APP_NAME!;
+const owner = process.env.OWNER!;
+const unstructuredDataBucketName = process.env.UNSTRUCTURED_DATA_BUCKET_NAME!;
+const goldenDatasetBucketName = process.env.GOLDEN_DATASET_BUCKET_NAME!;
+const embeddingDatasetBucketName = process.env.EMBEDDING_DATASET_BUCKET_NAME!;
+
+// apply tags to all resources
+appAspects.add(new ApplyTags({
+  environment: deployEnvironment as 'development' | 'staging' | 'production' | 'demonstration',
+  project: appName,
+  owner: owner,
+}));
+
+// security check
+appAspects.add(new AwsSolutionsChecks());
+
+const stackProps: SimpleDataIngestionStackProps = {
+  resourcePrefix: `${appName}-${deployEnvironment}-${cdkRegion}`,
+  env: {
+    region: cdkRegion,
+    account,
+  },
+  deployRegion: cdkRegion,
+  deployEnvironment,
+  appName,
+  unstructuredDataBucketName,
+  goldenDatasetBucketName,
+  embeddingDatasetBucketName,
+};
+new SimpleDataIngestionStack(app, `SimpleDataIngestionStack`, {
+  ...stackProps,
+  stackName: `${appName}-${deployEnvironment}-${cdkRegion}-SimpleDataIngestionStack`,
+  description: `SimpleDataIngestionStack for ${appName} in ${cdkRegion} ${deployEnvironment}.`,
 });
+
+app.synth();
