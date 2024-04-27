@@ -38,11 +38,11 @@ export async function handler(event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
     try {
         const command = new GetObjectCommand(params);
-        const url = await getSignedUrl(s3Client, command, { expiresIn: 60 }); // this link will expire in 60 seconds
+        const signedUrl = await getSignedUrl(s3Client, command, { expiresIn: 60 }); // this link will expire in 60 seconds
         console.log(`${prefix} - Presigned URL generated.`);
         return {
             statusCode: StatusCodes.OK,
-            body: JSON.stringify({ url }),
+            body: JSON.stringify({ signedUrl: signedUrl }),
         };
     } catch (error) {
         console.error(`${prefix} - Error generating presigned URL: ${error}`);
