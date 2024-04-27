@@ -16,6 +16,9 @@ export class DataParserStack extends cdk.NestedStack {
         const s3FileUploadQueue = props.s3UnstructuredFileUploadQueue;
         const s3GoldenDatasetFileUploadQueue = props.s3GoldenDatasetFileUploadQueue;
 
+        const s3UnstructuredDataBucket = props.s3UnstructuredDataBucket;
+        const s3GoldenDatasetBucket = props.s3GoldenDatasetBucket;
+
         const dataParserLambdaFn = new PythonFunction(this, `${props.resourcePrefix}-dataParserLambdaFn`, {
             functionName: `${props.resourcePrefix}-${props.deployRegion}-dataParserLambdaFn`,
             runtime: cdk.aws_lambda.Runtime.PYTHON_3_11,
@@ -29,7 +32,7 @@ export class DataParserStack extends cdk.NestedStack {
             environment: {
                 SQS_SOURCE_QUEUE_URL: s3FileUploadQueue.queueUrl,
                 SQS_DESTINATION_QUEUE_URL: s3GoldenDatasetFileUploadQueue.queueUrl,
-                S3_BUCKET_NAME: props.s3UnstructuredDataBucket.bucketName,
+                S3_BUCKET_NAME: s3GoldenDatasetBucket.bucketName,
             },
             role: new cdk.aws_iam.Role(this, `${props.resourcePrefix}-${props.deployRegion}-dataParserLambdaFn-Role`, {
                 assumedBy: new cdk.aws_iam.ServicePrincipal('lambda.amazonaws.com'),
@@ -44,6 +47,12 @@ export class DataParserStack extends cdk.NestedStack {
 
         // grant permission for dataParserLambdaFn to send messages to s3GoldenDatasetFileUploadQueue
         s3GoldenDatasetFileUploadQueue.grantSendMessages(dataParserLambdaFn);
+
+        // grant permission for dataParserLambdaFn to read from s3UnstructuredDataBucket
+        s3UnstructuredDataBucket.grantRead(dataParserLambdaFn);
+
+        // grant permission for dataParserLambdaFn to write to s3GoldenDatasetBucket
+        s3GoldenDatasetBucket.grantWrite(dataParserLambdaFn);
 
         // grant permission for textractResultQueue to invoke dataParserLambdaFn
         dataParserLambdaFn.addPermission('AllowSQSInvocation', {
