@@ -22,7 +22,7 @@ export class DataParserStack extends cdk.NestedStack {
         const dataParserLambdaFn = new PythonFunction(this, `${props.resourcePrefix}-dataParserLambdaFn`, {
             functionName: `${props.resourcePrefix}-${props.deployRegion}-dataParserLambdaFn`,
             runtime: cdk.aws_lambda.Runtime.PYTHON_3_11,
-            entry: path.join(__dirname, '../src/lambdas/data-parser'),
+            entry: path.join(__dirname, '../../../src/lambdas/data-parser'),
             handler: "handler",
             architecture: lambda.Architecture.ARM_64,
             runtimeManagementMode: lambda.RuntimeManagementMode.AUTO,
@@ -70,6 +70,6 @@ export class DataParserStack extends cdk.NestedStack {
         }));
 
         // Configure S3 event notifications to send a message to s3FileUploadQueue when a new object is created
-        props.s3GoldenDatasetBucket.addEventNotification(s3.EventType.OBJECT_CREATED, new s3n.SqsDestination(s3FileUploadQueue));
+        s3GoldenDatasetBucket.addEventNotification(s3.EventType.OBJECT_CREATED, new s3n.SqsDestination(s3FileUploadQueue));
     }
 }
