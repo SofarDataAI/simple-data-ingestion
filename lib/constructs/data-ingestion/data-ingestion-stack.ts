@@ -19,12 +19,12 @@ export class DataIngestionStack extends NestedStack {
   constructor(scope: Construct, id: string, props: DataIngestionStackProps) {
     super(scope, id, props);
 
-    const uploadingBucket = props.uploadingBucket;
+    const uploadingBucket = props.s3UnstructuredDataBucket;
 
     const dataIngestionLambdaFn = new LlrtFunction(this, `${props.resourcePrefix}-dataIngestionLambdaFn`, {
       functionName: `${props.resourcePrefix}-dataIngestionLambdaFn`,
       runtime: cdk.aws_lambda.Runtime.NODEJS_20_X,
-      entry: path.join(__dirname, '../src/lambdas/data-ingestion/index.ts'),
+      entry: path.join(__dirname, '../../../src/lambdas/data-ingestion/index.ts'),
       handler: 'handler',
       environment: {
           S3_BUCKET_NAME: uploadingBucket.bucketName,
@@ -54,8 +54,8 @@ export class DataIngestionStack extends NestedStack {
           forceDockerBundling: true,
       },
       awsSdkConnectionReuse: false, // https://speedrun.nobackspacecrew.com/blog/2024/03/13/lambda-environment-variables-impact-on-coldstarts.html#does-it-impact-you
-      projectRoot: path.join(__dirname, '../src/lambdas/data-ingestion'),
-      depsLockFilePath: path.join(__dirname, '../src/lambdas/data-ingestion/package-lock.json'),
+      projectRoot: path.join(__dirname, '../../../src/lambdas/data-ingestion'),
+      depsLockFilePath: path.join(__dirname, '../../../src/lambdas/data-ingestion/package-lock.json'),
     });
 
     // grant permissions to the lambda function
