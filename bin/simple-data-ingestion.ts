@@ -46,7 +46,7 @@ appAspects.add(new ApplyTags({
 appAspects.add(new AwsSolutionsChecks());
 
 const stackProps: SimpleDataIngestionStackProps = {
-  resourcePrefix: `${appName}-${deployEnvironment}-${cdkRegion}`,
+  resourcePrefix: `${appName}-${deployEnvironment}`,
   env: {
     region: cdkRegion,
     account,

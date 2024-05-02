@@ -11,3 +11,4 @@ cdk.out
 .aider*
 cdk.context.json
 *.DS_Store
+*.tmp
